@@ -78,6 +78,3 @@ exclude_lines = [
 
 [tool.coverage.html]
 show_contexts = true
-
-[tool.poetry.scripts]
-app = "coalesce_api.main:main_cli"
