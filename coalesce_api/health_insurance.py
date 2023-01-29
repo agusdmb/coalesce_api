@@ -20,6 +20,10 @@ class HealthInsuranceAPITimeout(HealthInsuranceException):
     pass
 
 
+class HealthInsuranceValueError(HealthInsuranceException):
+    pass
+
+
 def get_health_insurance_details(url: str, member_id: str) -> HealthInsuranceDetails:
     try:
         response = requests.get(
@@ -34,6 +38,11 @@ def get_health_insurance_details(url: str, member_id: str) -> HealthInsuranceDet
 def average_health_insurances(
     health_insurances: Sequence[HealthInsuranceDetails],
 ) -> HealthInsuranceDetails:
+    if not health_insurances:
+        raise HealthInsuranceValueError(
+            "Must provide at least one Health Insurance to compute average."
+        )
+
     deductible_avg = 0
     stop_loss_avg = 0
     oop_max_avg = 0
