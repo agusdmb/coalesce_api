@@ -43,6 +43,9 @@ disable = [
   "C0103",  # Argument name X doesnt conform to snake_case naming style
   "R0903",  # Too few public methods
   "W0511",  # TODO XXX FIXME
+  "C0114",  # Missing module docstring
+  "C0115",  # Missing class docstring
+  "C0116",  # Missing function or method docstring
 ]
 
 [tool.pylint.'MESSAGES CONTROL']
