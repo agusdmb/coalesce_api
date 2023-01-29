@@ -117,7 +117,7 @@ def test_get_coalesce_health_insurance():
             json={"deductible": 1000, "stop_loss": 10000, "oop_max": 6000},
         )
         coalesce_health_insurance = health_insurance.get_coalesce_health_insurance(
-            sources, member_id
+            strategies.average_health_insurances, sources, member_id
         )
 
     assert coalesce_health_insurance == models.HealthInsuranceDetails(

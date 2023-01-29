@@ -23,8 +23,8 @@ def get_health_insurance_details(
 
 
 def get_coalesce_health_insurance(
-    sources: list[str], member_id: str
+    strategy: strategies.CoalesceStrategy, sources: list[str], member_id: str
 ) -> models.HealthInsuranceDetails:
-    return strategies.average_health_insurances(
+    return strategy(
         [get_health_insurance_details(source, member_id) for source in sources]
     )

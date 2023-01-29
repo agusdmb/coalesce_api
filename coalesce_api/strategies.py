@@ -1,6 +1,10 @@
-from typing import Sequence
+from typing import Callable, Sequence
 
 from coalesce_api import exceptions, models
+
+CoalesceStrategy = Callable[
+    [Sequence[models.HealthInsuranceDetails]], models.HealthInsuranceDetails
+]
 
 
 def average_health_insurances(
