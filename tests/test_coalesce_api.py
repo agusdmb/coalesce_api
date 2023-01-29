@@ -69,3 +69,8 @@ def test_average_health_insurances(health_insurances, avg_health_insurance):
     assert avg_health_insurance == health_insurance.average_health_insurances(
         health_insurances
     )
+
+
+def test_average_health_insurances_empty_case():
+    with pytest.raises(health_insurance.HealthInsuranceValueError):
+        health_insurance.average_health_insurances([])
