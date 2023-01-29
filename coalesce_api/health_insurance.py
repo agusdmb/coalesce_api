@@ -14,7 +14,7 @@ def get_health_insurance_details(
         health_insurance_details = models.HealthInsuranceDetails(**response.json())
     except requests.exceptions.Timeout as e:
         raise exceptions.HealthInsuranceAPITimeout() from e
-    except ValidationError as e:
+    except (ValidationError, requests.exceptions.JSONDecodeError) as e:
         raise exceptions.HealthInsuranceAPIValidationError() from e
     return health_insurance_details
 
