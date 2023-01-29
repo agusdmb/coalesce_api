@@ -50,6 +50,19 @@ def test_get_health_insurance_details_fails():
             health_insurance.get_health_insurance_details(url, member_id)
 
 
+def test_get_health_insurance_details_bad_data():
+    url = "http://api1.com"
+    member_id = "1"
+
+    with requests_mock.Mocker() as m:
+        m.get(
+            url,
+            json={},
+        )
+        with pytest.raises(health_insurance.HealthInsuranceAPIValidationError):
+            health_insurance.get_health_insurance_details(url, member_id)
+
+
 @pytest.mark.parametrize(
     "health_insurances,avg_health_insurance",
     [
