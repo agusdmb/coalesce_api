@@ -4,7 +4,7 @@ import requests_mock
 from hypothesis import example, given
 from hypothesis import strategies as st
 
-from coalesce_api import __version__, health_insurance
+from coalesce_api import __version__, exceptions, health_insurance, models, strategies
 
 
 def test_version():
@@ -35,7 +35,7 @@ def test_get_health_insurance_details(url, member_id, deductible, stop_loss, oop
         health_insurance_deatails = health_insurance.get_health_insurance_details(
             url, member_id
         )
-        assert health_insurance_deatails == health_insurance.HealthInsuranceDetails(
+        assert health_insurance_deatails == models.HealthInsuranceDetails(
             deductible=deductible, stop_loss=stop_loss, oop_max=oop_max
         )
 
@@ -46,7 +46,7 @@ def test_get_health_insurance_details_fails():
 
     with requests_mock.Mocker() as m:
         m.get(url, exc=requests.exceptions.Timeout)
-        with pytest.raises(health_insurance.HealthInsuranceAPITimeout):
+        with pytest.raises(exceptions.HealthInsuranceAPITimeout):
             health_insurance.get_health_insurance_details(url, member_id)
 
 
@@ -59,7 +59,7 @@ def test_get_health_insurance_details_bad_data():
             url,
             json={},
         )
-        with pytest.raises(health_insurance.HealthInsuranceAPIValidationError):
+        with pytest.raises(exceptions.HealthInsuranceAPIValidationError):
             health_insurance.get_health_insurance_details(url, member_id)
 
 
@@ -67,42 +67,36 @@ def test_get_health_insurance_details_bad_data():
     "health_insurances,avg_health_insurance",
     [
         (
-            [
-                health_insurance.HealthInsuranceDetails(
-                    deductible=0, stop_loss=0, oop_max=0
-                )
-            ],
-            health_insurance.HealthInsuranceDetails(
-                deductible=0, stop_loss=0, oop_max=0
-            ),
+            [models.HealthInsuranceDetails(deductible=0, stop_loss=0, oop_max=0)],
+            models.HealthInsuranceDetails(deductible=0, stop_loss=0, oop_max=0),
         ),
         (
             [
-                health_insurance.HealthInsuranceDetails(
+                models.HealthInsuranceDetails(
                     deductible=1000, stop_loss=10000, oop_max=5000
                 ),
-                health_insurance.HealthInsuranceDetails(
+                models.HealthInsuranceDetails(
                     deductible=1200, stop_loss=13000, oop_max=6000
                 ),
-                health_insurance.HealthInsuranceDetails(
+                models.HealthInsuranceDetails(
                     deductible=1000, stop_loss=10000, oop_max=6000
                 ),
             ],
-            health_insurance.HealthInsuranceDetails(
+            models.HealthInsuranceDetails(
                 deductible=1066, stop_loss=11000, oop_max=5666
             ),
         ),
     ],
 )
 def test_average_health_insurances(health_insurances, avg_health_insurance):
-    assert avg_health_insurance == health_insurance.average_health_insurances(
+    assert avg_health_insurance == strategies.average_health_insurances(
         health_insurances
     )
 
 
 def test_average_health_insurances_empty_case():
-    with pytest.raises(health_insurance.HealthInsuranceValueError):
-        health_insurance.average_health_insurances([])
+    with pytest.raises(exceptions.HealthInsuranceValueError):
+        strategies.average_health_insurances([])
 
 
 def test_get_coalesce_health_insurance():
@@ -126,6 +120,6 @@ def test_get_coalesce_health_insurance():
             sources, member_id
         )
 
-    assert coalesce_health_insurance == health_insurance.HealthInsuranceDetails(
+    assert coalesce_health_insurance == models.HealthInsuranceDetails(
         deductible=1066, stop_loss=11000, oop_max=5666
     )

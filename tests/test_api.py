@@ -6,7 +6,7 @@ import requests_mock
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from coalesce_api import health_insurance
+from coalesce_api import models
 from coalesce_api.api import app
 
 
@@ -42,7 +42,7 @@ def test_coalesce_endpoint(client: TestClient):
 
     assert response.status_code == status.HTTP_200_OK
 
-    assert response.json() == health_insurance.HealthInsuranceDetails(
+    assert response.json() == models.HealthInsuranceDetails(
         deductible=1066, stop_loss=11000, oop_max=5666
     )
 
@@ -55,7 +55,7 @@ def test_coalesce_endpoint_timeout(client: TestClient):
                 sources[0],
                 json={"deductible": 1000, "stop_loss": 10000, "oop_max": 5000},
             )
-            m.get(sources[1], exc=requests.exceptions.Timeout),
+            m.get(sources[1], exc=requests.exceptions.Timeout)
             m.get(
                 sources[2],
                 json={"deductible": 1000, "stop_loss": 10000, "oop_max": 6000},
