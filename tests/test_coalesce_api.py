@@ -63,6 +63,19 @@ def test_get_health_insurance_details_fails():
                 deductible=0, stop_loss=0, oop_max=0
             ),
         ),
+        (
+            [
+                health_insurance.HealthInsuranceDetails(
+                    deductible=0, stop_loss=0, oop_max=0
+                ),
+                health_insurance.HealthInsuranceDetails(
+                    deductible=10, stop_loss=100, oop_max=1000
+                ),
+            ],
+            health_insurance.HealthInsuranceDetails(
+                deductible=5, stop_loss=50, oop_max=500
+            ),
+        ),
     ],
 )
 def test_average_health_insurances(health_insurances, avg_health_insurance):
