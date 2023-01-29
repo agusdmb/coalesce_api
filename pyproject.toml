@@ -5,7 +5,7 @@ description = ""
 authors = ["Agustin Marquez <agusdmb@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.10.6"
 fastapi = "^0.89.1"
 uvicorn = "^0.20.0"
 
@@ -19,7 +19,59 @@ coverage = "^7.1.0"
 safety = "^2.3.5"
 bandit = "^1.7.4"
 pre-commit = "^3.0.1"
+pytest-asyncio = "^0.20.3"
+pytest-randomly = "^3.12.0"
+pytest-repeat = "^0.9.1"
+pytest-xdist = "^3.1.0"
+pytest-cov = "^4.0.0"
+hypothesis = "^6.65.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.pylint.messages_control]
+disable = [
+  "C0103",  # Argument name X doesnt conform to snake_case naming style
+  "R0903",  # Too few public methods
+  "W0511",  # TODO XXX FIXME
+]
+
+[tool.pylint.'MESSAGES CONTROL']
+extension-pkg-whitelist = "pydantic"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+# log_cli = true
+
+[tool.coverage.report]
+skip_empty = true
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "def __str__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "^if __name__ == .__main__.:$",
+  "^from ",
+  "^import ",
+  "^if TYPE_CHECKING:",
+  "^if typing.TYPE_CHECKING:",
+]
+
+[tool.coverage.html]
+show_contexts = true
+
+[tool.poetry.scripts]
+app = "coalesce_api.main:main_cli"
