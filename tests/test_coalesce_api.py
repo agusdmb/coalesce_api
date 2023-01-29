@@ -1,3 +1,5 @@
+import pytest
+import requests
 import requests_mock
 from hypothesis import example, given
 from hypothesis.strategies import from_regex, integers
@@ -36,3 +38,13 @@ def test_get_health_insurance_details(url, member_id, deductible, stop_loss, oop
         assert health_insurance_deatails == health_insurance.HealthInsuranceDetails(
             deductible=deductible, stop_loss=stop_loss, oop_max=oop_max
         )
+
+
+def test_get_health_insurance_details_fails():
+    url = "http://api1.com"
+    member_id = "1"
+
+    with requests_mock.Mocker() as m:
+        m.get(url, exc=requests.exceptions.Timeout)
+        with pytest.raises(health_insurance.HealthInsuranceAPITimeout):
+            health_insurance.get_health_insurance_details(url, member_id)
