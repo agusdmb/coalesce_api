@@ -66,14 +66,17 @@ def test_get_health_insurance_details_fails():
         (
             [
                 health_insurance.HealthInsuranceDetails(
-                    deductible=0, stop_loss=0, oop_max=0
+                    deductible=1000, stop_loss=10000, oop_max=5000
                 ),
                 health_insurance.HealthInsuranceDetails(
-                    deductible=10, stop_loss=100, oop_max=1000
+                    deductible=1200, stop_loss=13000, oop_max=6000
+                ),
+                health_insurance.HealthInsuranceDetails(
+                    deductible=1000, stop_loss=10000, oop_max=6000
                 ),
             ],
             health_insurance.HealthInsuranceDetails(
-                deductible=5, stop_loss=50, oop_max=500
+                deductible=1066, stop_loss=11000, oop_max=5666
             ),
         ),
     ],
@@ -87,3 +90,29 @@ def test_average_health_insurances(health_insurances, avg_health_insurance):
 def test_average_health_insurances_empty_case():
     with pytest.raises(health_insurance.HealthInsuranceValueError):
         health_insurance.average_health_insurances([])
+
+
+def test_get_coalesce_health_insurance():
+    member_id = "1"
+    sources = ["http://api1.com", "http://api2.com", "http://api3.com"]
+
+    with requests_mock.Mocker() as m:
+        m.get(
+            sources[0],
+            json={"deductible": 1000, "stop_loss": 10000, "oop_max": 5000},
+        )
+        m.get(
+            sources[1],
+            json={"deductible": 1200, "stop_loss": 13000, "oop_max": 6000},
+        )
+        m.get(
+            sources[2],
+            json={"deductible": 1000, "stop_loss": 10000, "oop_max": 6000},
+        )
+        coalesce_health_insurance = health_insurance.get_coalesce_health_insurance(
+            sources, member_id
+        )
+
+    assert coalesce_health_insurance == health_insurance.HealthInsuranceDetails(
+        deductible=1066, stop_loss=11000, oop_max=5666
+    )
