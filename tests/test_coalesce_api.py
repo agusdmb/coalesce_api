@@ -2,7 +2,7 @@ import pytest
 import requests
 import requests_mock
 from hypothesis import example, given
-from hypothesis.strategies import from_regex, integers
+from hypothesis import strategies as st
 
 from coalesce_api import __version__, health_insurance
 
@@ -11,7 +11,7 @@ def test_version():
     assert __version__ == "0.1.0"
 
 
-url_strategy = from_regex(
+url_strategy = st.from_regex(
     r"https?://[a-zA-Z0-9]+\.[a-zA-Z]+\.(com|org)", fullmatch=True
 )
 
@@ -25,7 +25,7 @@ url_strategy = from_regex(
 @example(
     url="http://api3.com", member_id="1", deductible=1000, stop_loss=10000, oop_max=6000
 )
-@given(url_strategy, integers(), integers(), integers(), integers())
+@given(url_strategy, st.integers(), st.integers(), st.integers(), st.integers())
 def test_get_health_insurance_details(url, member_id, deductible, stop_loss, oop_max):
     with requests_mock.Mocker() as m:
         m.get(
@@ -48,3 +48,42 @@ def test_get_health_insurance_details_fails():
         m.get(url, exc=requests.exceptions.Timeout)
         with pytest.raises(health_insurance.HealthInsuranceAPITimeout):
             health_insurance.get_health_insurance_details(url, member_id)
+
+
+@pytest.mark.parametrize(
+    "health_insurances,avg_health_insurance",
+    [
+        (
+            [
+                health_insurance.HealthInsuranceDetails(
+                    deductible=0, stop_loss=0, oop_max=0
+                )
+            ],
+            health_insurance.HealthInsuranceDetails(
+                deductible=0, stop_loss=0, oop_max=0
+            ),
+        ),
+        (
+            [
+                health_insurance.HealthInsuranceDetails(
+                    deductible=0, stop_loss=0, oop_max=0
+                ),
+                health_insurance.HealthInsuranceDetails(
+                    deductible=10, stop_loss=100, oop_max=1000
+                ),
+            ],
+            health_insurance.HealthInsuranceDetails(
+                deductible=5, stop_loss=50, oop_max=500
+            ),
+        ),
+    ],
+)
+def test_average_health_insurances(health_insurances, avg_health_insurance):
+    assert avg_health_insurance == health_insurance.average_health_insurances(
+        health_insurances
+    )
+
+
+def test_average_health_insurances_empty_case():
+    with pytest.raises(health_insurance.HealthInsuranceValueError):
+        health_insurance.average_health_insurances([])
