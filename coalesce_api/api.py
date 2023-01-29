@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, status
 
-from coalesce_api import constants, exceptions, health_insurance, strategies
+from coalesce_api import constants, exceptions, health_insurance, models, strategies
 
 app = FastAPI()
 
@@ -11,7 +11,7 @@ async def ping():
 
 
 @app.get("/coalesce")
-async def coalesce(member_id: str):
+async def coalesce(member_id: str) -> models.HealthInsuranceDetails:
     try:
         return health_insurance.get_coalesce_health_insurance(
             strategies.average_health_insurances, constants.SOURCES, member_id
