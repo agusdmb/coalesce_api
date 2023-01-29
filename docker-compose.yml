@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+
+  prod:
+    build:
+      context: .
+      target: prod
+    image: coalesce_api
+
+  dev:
+    build:
+      context: .
+      target: dev
+    image: coalesce_api_dev
+
+  app:
+    image: coalesce_api
+    depends_on:
+      - prod
+    volumes:
+      - .:/code
+    ports:
+      - "8080:80"
+    entrypoint: ["poetry", "run", "uvicorn", "coalesce_api.api:app", "--host", "0.0.0.0", "--port", "80"]
+    restart: unless-stopped
+
+  test:
+    image: coalesce_api_dev
+    entrypoint: ["poetry", "run", "python", "-m", "pytest"]
+    volumes:
+      - .:/code
+    depends_on:
+      - dev
