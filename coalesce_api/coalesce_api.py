@@ -1,4 +1,7 @@
+import requests
 from pydantic import BaseModel
+
+TIMEOUT_SECONDS = 5.0
 
 
 class HealthInsuranceDetails(BaseModel):
@@ -8,4 +11,8 @@ class HealthInsuranceDetails(BaseModel):
 
 
 def get_health_insurance_details(url: str, member_id: str) -> HealthInsuranceDetails:
-    return HealthInsuranceDetails(deductible=1000, stop_loss=10000, oop_max=5000)
+    response = requests.get(
+        url, params={"member_id": member_id}, timeout=TIMEOUT_SECONDS
+    )
+    health_insurance_details = HealthInsuranceDetails(**response.json())
+    return health_insurance_details
