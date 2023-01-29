@@ -13,3 +13,9 @@ def client_fixture():
 def test_ping(client: TestClient):
     response = client.get("/ping")
     assert response.json() == "pong"
+
+
+def test_coalesce_endpoint(client: TestClient):
+    response = client.get("/coalesce", params={"member_id": "1"})
+    assert response.json() == "1"
+    assert response.status_code == 200
