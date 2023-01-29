@@ -15,6 +15,8 @@ url_strategy = st.from_regex(
     r"https?://[a-zA-Z0-9]+\.[a-zA-Z]+\.(com|org)", fullmatch=True
 )
 
+url_safe_strategy = st.from_regex(r"[a-z0-9]+", fullmatch=True)
+
 
 @example(
     url="http://api1.com", member_id="1", deductible=1000, stop_loss=10000, oop_max=5000
@@ -25,7 +27,7 @@ url_strategy = st.from_regex(
 @example(
     url="http://api3.com", member_id="1", deductible=1000, stop_loss=10000, oop_max=6000
 )
-@given(url_strategy, st.integers(), st.integers(), st.integers(), st.integers())
+@given(url_strategy, url_safe_strategy, st.integers(), st.integers(), st.integers())
 def test_get_health_insurance_details(url, member_id, deductible, stop_loss, oop_max):
     with requests_mock.Mocker() as m:
         m.get(
@@ -35,6 +37,7 @@ def test_get_health_insurance_details(url, member_id, deductible, stop_loss, oop
         health_insurance_deatails = health_insurance.get_health_insurance_details(
             url, member_id
         )
+        assert m.request_history[-1].query == f"member_id={member_id}"
         assert health_insurance_deatails == models.HealthInsuranceDetails(
             deductible=deductible, stop_loss=stop_loss, oop_max=oop_max
         )
