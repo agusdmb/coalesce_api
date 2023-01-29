@@ -1,7 +1,7 @@
 from typing import Sequence
 
 import requests
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 TIMEOUT_SECONDS = 5.0
 
@@ -24,6 +24,10 @@ class HealthInsuranceValueError(HealthInsuranceException):
     pass
 
 
+class HealthInsuranceAPIValidationError(HealthInsuranceException):
+    pass
+
+
 def get_health_insurance_details(url: str, member_id: str) -> HealthInsuranceDetails:
     try:
         response = requests.get(
@@ -31,7 +35,10 @@ def get_health_insurance_details(url: str, member_id: str) -> HealthInsuranceDet
         )
     except requests.exceptions.Timeout as e:
         raise HealthInsuranceAPITimeout() from e
-    health_insurance_details = HealthInsuranceDetails(**response.json())
+    try:
+        health_insurance_details = HealthInsuranceDetails(**response.json())
+    except ValidationError as e:
+        raise HealthInsuranceAPIValidationError() from e
     return health_insurance_details
 
 
