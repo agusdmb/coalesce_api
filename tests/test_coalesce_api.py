@@ -2,7 +2,7 @@ import requests_mock
 from hypothesis import example, given
 from hypothesis.strategies import from_regex, integers
 
-from coalesce_api import __version__, coalesce_api
+from coalesce_api import __version__, health_insurance
 
 
 def test_version():
@@ -30,9 +30,9 @@ def test_get_health_insurance_details(url, member_id, deductible, stop_loss, oop
             url,
             json={"deductible": deductible, "stop_loss": stop_loss, "oop_max": oop_max},
         )
-        health_insurance_deatails = coalesce_api.get_health_insurance_details(
+        health_insurance_deatails = health_insurance.get_health_insurance_details(
             url, member_id
         )
-        assert health_insurance_deatails == coalesce_api.HealthInsuranceDetails(
+        assert health_insurance_deatails == health_insurance.HealthInsuranceDetails(
             deductible=deductible, stop_loss=stop_loss, oop_max=oop_max
         )
