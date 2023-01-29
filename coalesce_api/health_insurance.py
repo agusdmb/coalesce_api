@@ -11,10 +11,9 @@ def get_health_insurance_details(
         response = requests.get(
             url, params={"member_id": member_id}, timeout=constants.TIMEOUT_SECONDS
         )
+        health_insurance_details = models.HealthInsuranceDetails(**response.json())
     except requests.exceptions.Timeout as e:
         raise exceptions.HealthInsuranceAPITimeout() from e
-    try:
-        health_insurance_details = models.HealthInsuranceDetails(**response.json())
     except ValidationError as e:
         raise exceptions.HealthInsuranceAPIValidationError() from e
     return health_insurance_details
