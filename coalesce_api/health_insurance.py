@@ -55,3 +55,11 @@ def average_health_insurances(
         stop_loss=stop_loss_avg // len(health_insurances),
         oop_max=oop_max_avg // len(health_insurances),
     )
+
+
+def get_coalesce_health_insurance(
+    sources: list[str], member_id: str
+) -> HealthInsuranceDetails:
+    return average_health_insurances(
+        [get_health_insurance_details(source, member_id) for source in sources]
+    )
